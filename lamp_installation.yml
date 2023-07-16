@@ -1,0 +1,38 @@
+- name: Install LAMP Server  # Installation du serveur LAMP
+  hosts: all  # Les tâches seront exécutées sur tous les hôtes
+  become: yes  # Exécuter en tant que superutilisateur (root)
+  tasks:
+    - name: Update apt cache  # Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+
+    - name: Install Apache  # Installer Apache
+      apt:
+        name: apache2  # Nom du paquet Apache à installer
+        state: present  # Assurer que le paquet est présent
+
+    - name: Install MySQL  # Installer MySQL
+      apt:
+        name: mysql-server  # Nom du paquet MySQL à installer
+        state: present  # Assurer que le paquet est présent
+
+    - name: Secure MySQL installation  # Sécuriser l'installation de MySQL
+      debconf:
+        name: mysql-server
+        question: mysql-server/root_password
+        value: your_mysql_root_password  # Remplacer par votre mot de passe MySQL root réel
+        vtype: password
+      become_user: root  # Passer en tant que superutilisateur (root)
+
+    - name: Install PHP and required modules  # Installer PHP et les modules requis
+      apt:
+        name: 
+          - php
+          - libapache2-mod-php
+          - php-mysql
+        state: present  # Assurer que les paquets sont présents
+
+    - name: Restart Apache service  # Redémarrer le service Apache
+      service:
+        name: apache2  # Nom du service Apache à redémarrer
+        state: restarted
